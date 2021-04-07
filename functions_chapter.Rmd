@@ -1,0 +1,361 @@
+---
+title: "Advanced R: Functions"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r, echo = FALSE}
+library(learnr)
+
+```
+
+## 6.1 Quiz
+
+```{r elementos, echo=FALSE}
+question("¿Cuáles son los 3 componentes de una función?",
+  answer("Argumentos, cuerpo, resultado"),
+  answer("Argumentos, ambiete, resultado"),
+  answer("Cuerpo, argumentos, ambiente", correct = TRUE)
+)
+
+
+```
+
+```{r ex1, exercise = TRUE}
+x <- 10
+f1 <- function(x) {
+  function() {
+    x + 10
+  }
+}
+f1(1)()
+```
+
+```{r once, echo=FALSE}
+question("¿Qué regresa el código anterior?",
+  answer("ERROR"),
+  answer("11" , correct = TRUE),
+  answer("NA"),
+  answer("10")
+)
+```
+
+```{r ex2, exercise = TRUE}
+`+`(1, `*`(2, 3))
+```
+
+```{r suma, echo=FALSE}
+question("¿Cómo escribimos este código normalmente?",
+  answer("(1 * 2) + (1 * 3)"),
+  answer("1 + (2 * 3)" , correct = TRUE)
+)
+```
+
+```{r ex3, exercise = TRUE}
+mean(, TRUE, x = c(1:10, NA))
+```
+
+```{r mean, echo=FALSE}
+question("¿Cómo harías que este código sea más fácil de leer?",
+  answer("mean( x = c(1:10, NA), na.rm = TRUE)", correct = TRUE),
+  answer("mean(TRUE, x = c(1:10, NA))"),
+  answer("mean(c(1:10, NA), na.rm = TRUE)", correct = TRUE)
+)
+```
+
+```{r ex4, exercise = TRUE}
+f2 <- function(a, b) {
+  a * 10
+}
+f2(10, stop("This is an error!"))
+```
+
+```{r sino, echo=FALSE}
+question("¿Regresa un error el código anterior? ¿Por qué?",
+  answer("Sí"),
+  answer("No" , correct = TRUE)
+)
+```
+
+## 6.2 Fundamentos de las funciones
+
+Hay 2 cosas importantes para poder entender las funciones.
+
+  1. Las funciones tienen 3 componentes. (Existen casos especiales)
+  2. Las funciones son objetos
+
+### 6.2.1 Componentes de las funciones 
+
+Los componentes de una función son:
+
+  * **Argumentos**: lista de argumentos que controla como se llama la función 
+  * **Cuerpo**: Código a ejecutar 
+  * **Ambiente**: Estructura de datos que determina como la función encuentra los valores asociados a los nombres 
+
+
+Los argumentos y el cuerpo de la función son especificados en el momento que escribimos la función, mientras que el ambiente se especifica de manera implícita, con base en _el lugar_ donde definimos la función. El ambiente siempre existe.
+
+```{r f621, exercise=TRUE}
+# Función con parámetros x & y
+f02 <- function(x, y) {
+  # Suma x & y
+  x + y
+}
+# Argumentos
+formals(f02)
+# Cuerpo
+body(f02)
+# Ambiente 
+environment(f02)
+```
+
+
+Las funciones también pueden  tener  atributos adicionales. Un atributo que nos
+puede ayudar a  conocer a más detalle el código de la función
+es `srcref`. Esta función dirge al código fuente usado para crear la función. 
+
+```{r f6211, exercise=TRUE}
+f02 <- function(x, y) {
+  # Suma x & y
+  x + y
+}
+#Cuerpo
+attr(f02, "srcref")
+```
+
+
+### 6.2.2 Funciones primitivas 
+Las funciones primitivas son aquellas que fueron implementadas en  __C__ por lo tanto
+cada que son utilizadas llaman codigo de __C__ directamente.
+
+Algunos datos adicionales sobre estas funciones primitivas son:
+
+  * Solo podemos encontrarlas en el paquete base.
+  * formals(), body()  y environment() son NULL
+  * Son objetos de tipo 'builtin' o 'special'
+
+```{r f622, exercise=TRUE}
+typeof(sum)
+formals(sum)
+#> NULL
+body(sum)
+#> NULL
+environment(sum)
+#> NULL
+
+```
+### 6.2.3 Funciones de primera clase
+
+A diferencia de otros lenguajes, no hay una sintáxis especial para definir y nombrar
+una función, simplemente se crea un objeto tipo función (con `function`) y lo vinculamos
+a un nombre con `<-`.
+
+```{r f623, exercise=TRUE}
+f01 <- function(x) {
+  sin(1 / x ^ 2)
+}
+f01(1)
+```
+
+No es necesario siempre vinvular una función a un nombre, podemos crear __funciones anónimas__.
+
+```{r f6232, exercise=TRUE}
+sapply(mtcars, function(x) length(unique(x)))
+Filter(function(x) !is.numeric(x), mtcars)
+integrate(function(x) sin(x) ^ 2, 0, pi)
+```
+
+También podemos guardar funciones en listas 😲
+
+```{r f6233, exercise=TRUE}
+funs <- list(
+  half = function(x) x / 2,
+  double = function(x) x * 2
+)
+
+funs$double(10)
+#> [1] 20
+```
+
+### 6.2.4 Invocar una función 👻 
+
+Normalmente podemos llamar a una función poniendo sus argumentos entre paréntesis después de su nombre.
+Pero, ¿qué pasa si los argumentos ya se encuentran dentro de una estructura de datos? ¡Podemos 
+utilizar `do.call()`!
+
+`do.call()` tiene dos argumentos: el nombre de la función y una lista con los argumentos de dicha función.
+
+```{r f624, exercise=TRUE}
+args <- list(1:10, na.rm = TRUE)
+do.call(mean, args)
+#> [1] 5.5
+```
+
+### 6.2.5 Ejercicios
+
+
+## 6.3 Composición de funciones
+
+**R** base nos da dos formas de realizar composiciones de llamadas de múltiples funciones:
+anidando o guardando los resultados intermedios.
+
+El paquete magrittr nos da una tercera opción con el operador `%>%`, llamado _pipe_ y
+se pronuncia "y luego".
+
+Por ejemplo, si quisiéramos calcular la desviación estándar por pasos usando `mean` y `sqrt`, tendríamos lo siguiente:
+
+```{r f63, exercise=TRUE}
+square <- function(x) x^2
+deviation <- function(x) x - mean(x)
+
+# Funciones anidadas
+x <- runif(100)
+
+sqrt(mean(square(deviation(x))))
+#> [1] 0.274
+
+# Guardando los resultados intermedios
+out <- deviation(x)
+out <- square(out)
+out <- mean(out)
+out <- sqrt(out)
+out
+#> [1] 0.274
+
+# Usando pipe
+library(magrittr)
+
+x %>%
+  deviation() %>%
+  square() %>%
+  mean() %>%
+  sqrt()
+#> [1] 0.274
+
+```
+
+`x %>% f()` es equivalente a `f(x)` y `x %>% f(y)` es equivalente a `f(x, y)`.
+
+Cada una de las opciones de composición tiene ventajas y desventajas:
+
+  * __Anidado__ `f(g(x))`: es ideal para seciencias cortas. Sin embargo, en secuencias largas
+  puede resultar confuso pues se leen de adentro hacia afuera y de derecha a izquierda. Puede
+  crear un problema del _sandwich de Dagwood_ 🥪.
+  * __Objetos intermedios__ `y <- f(x); g(y)`: requiere que nombremos todos los objetos intermedios.
+  Puede ser útil si estos objetos son importantes, pero de poca ayuda si solo son realmente intermedios.
+  * __Piping__  `x %>% f() %>% g()`: nos ayuda a leer el código de izquierda a derecha sin necesidad de 
+  nombrar objetos intermedios. Sin embargo, solo se aplica en secuencias lineales donde se transforma un solo objeto
+  y estamos asumiendo que el lector entiende la nomenclatura.
+  
+
+## 6.4 Alcance léxico
+
+Con __alcance__ nos referimos a el acto de encontrar el valor asociado a un nombre.
+
+¿Qué regresa el siguiente código?
+
+```{r f64, exercise=TRUE}
+x <- 10
+g01 <- function() {
+  x <- 20
+  x
+}
+
+g01()
+```
+
+A nivel lenguaje, **R** usa __alcance léxico__ (_lexical scoping_), esto implica que va a buscar los valores asociados a un nombre basándose en cómo la función es definida y no en cómo es nombrada.
+
+El alcance léxico en R sigue las siguientes reglas:
+
+  * Enmascaramiento de nombres o _name masking_ 
+  * Funciones vs variables
+  * Un nuevo comienzo
+  * Bísqueda dinámica
+  
+### 6.4.1 Enmascaramiento de nombres 🥸
+
+Los nombres definidos dentro de una función enmascaran los nombres definidos fuera de la función. Ejemplo:
+
+
+```{r f641, exercise=TRUE}
+x <- 10
+y <- 20
+g02 <- function() {
+  x <- 1
+  y <- 2
+  c(x, y)
+}
+g02()
+#> [1] 1 2
+```
+
+Si un nombre no está definido dentro de una función, **R** lo va a buscar un nivel arriba.
+
+```{r f6412, exercise=TRUE}
+x <- 2
+g03 <- function() {
+  y <- 1
+  c(x, y)
+}
+g03()
+#> [1] 2 1
+
+# Esto no afecta el valor de y
+y
+#> [1] 20
+```
+
+Las mismas reglas se cumplen si una función es definida dentro de otra función. Primero, R va a buscar dentro
+de la función actual. Después, va a buscar en donde esa función fue definida (y así hasta llegar al ambiente global).
+Finalmente, busca en otros paquetes cargados.
+
+¿Qué crees que regresa el siguiente código?
+
+```{r f6413, exercise=TRUE}
+x <- 1
+g04 <- function() {
+  y <- 2
+  i <- function() {
+    z <- 3
+    c(x, y, z)
+  }
+  i()
+}
+g04()
+```
+
+### 6.4.2 Funciones vs Variables ⚔️
+
+En R, las funciones son objetos comunes. Esto significa que las reglas descritas anteriormente también
+se cumplen para funciones.
+
+```{r f642, exercise=TRUE}
+g07 <- function(x) x + 1
+g08 <- function() {
+  g07 <- function(x) x + 100
+  g07(10)
+}
+g08()
+#> [1] 110
+```
+No obstante, cuando una función y un objeto que no es función comparten el mismo nombre (deben de estar en
+ambientes diferentes), seguir estas reglas se vuelve un poco complicado. Cuando usas un nombre como función,
+R ignora los objetos que no son funciones cuando busca el valor asignado.
+
+```{r f6422, exercise=TRUE}
+g09 <- function(x) x + 100
+g10 <- function() {
+  g09 <- 10
+  g09(g09)
+}
+g10()
+#> [1] 110
+```
+
+
+**Importante**: evita usar el mismo nombre para objetos distintos. ☠️☠️
+
