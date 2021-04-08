@@ -457,3 +457,33 @@ Con lo anterior podemos ver que cuando se hace una asignación dentro de una lla
 
 ### 6.5.2 Argumentos por defecto
 
+En las funciones es posible tener valores por defecto basados en otros argumentos o en variables definidas después dentro de  la función. 
+
+```{r e652, exercise=TRUE}
+h04 <- function(x = 1, y = x * 2, z = a + b) {
+  a <- 10
+  b <- 100
+  
+  c(x, y, z)
+}
+
+h04()
+```
+
+**Nota** Lo anterior puede ser un poco confuso y recomendamos utilizarlo con precaución
+
+El ambiente en que evaluamos los  argumentos por defecto y los que el usuario nos da pueden ser diferentes, ya que los argumentos por defecto se evaluarán dentro de la función y los dados por el usuario fuera.
+
+```{r e653, exercise=TRUE}
+h05 <- function(x = ls()) {
+  a <- 1
+  x
+}
+
+# ls() evaluado dentro de h05:
+h05()
+# ls() evaluado en el ambiente global:
+h05(ls())
+```
+
+### 6.5.3 Argumentos ausentes
