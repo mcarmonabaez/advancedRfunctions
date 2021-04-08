@@ -359,3 +359,101 @@ g10()
 
 **Importante**: evita usar el mismo nombre para objetos distintos. ☠️☠️
 
+### 6.4.3 Un nuevo comienzo 
+
+```{r e643, exercise=TRUE}
+g11 <- function() {
+  if (!exists("a")) {
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+# Ejecución 1
+g11()
+# Ejecución 2
+g11()
+```
+
+```{r ex643, echo=FALSE}
+question("¿Cuál es el resultado al llamar la funcion dos veces?",
+  answer("El resultado en ambas ejecuciones es el mismo", correct = TRUE),
+  answer("El resultado en la segunda ejecuciones es más grande"),
+  answer("El resultado en la primera ejecuciones es más grande")
+)
+```
+
+Algo importante que  necesitamos saber es que cada que las funciones son ejecutadas  un nuevo ambiente es creado para permitir la ejecución de la función. Por lo tanto no podemos saber que paso en la ejecución anterior ya que cada ejecución es independiente. 
+
+### 6.4.4 Búsqueda dinámica
+
+El resultado de ejecutar una función puede  ser  diferente dependiendo de los objetos fuera del entorno,  ya que R busca los valores  cuando se ejecuta la función no cuando la creamos y el alcance léxico determina donde pero no cuando buscar los valores. 
+
+```{r e644, exercise=TRUE}
+g12 <- function() x + 1
+x <- 15
+g12()
+#> [1] 16
+
+x <- 20
+g12()
+#> [1] 21
+```
+
+Lo anterior puede ser un  problema cuando ejecutamos la función, ya que si no tenemos bien claro todo el ambiente en el  que esta corriendo la función podemos tener un resultado no esperado. 
+
+Para poder saber las dependencias externas dentro de una función podemos utilizar __codetools::findGlobals()__.
+
+```{r e6441, exercise=TRUE}
+codetools::findGlobals(g12)
+#> [1] "+" "x"
+```
+
+Para poder controlar las dependencias externas podemos cambiar el ambiente de la función manualmente a un ambiente que no contiene nada con la función __emptyenv()__.
+
+```{r e6442, exercise=TRUE}
+environment(g12) <- emptyenv()
+g12()
+```
+
+**Nota**: __R__ se basa  en el alcance léxico para encontrar todo.
+
+## 6.5 Lazy evaluation
+
+En __R__ los argumentos de una función son evaluados sólo si se utilizan.
+```{r e65, exercise=TRUE}
+h01 <- function(x) {
+  10
+}
+h01(stop("This is an error!"))
+```
+
+### 6.5.1 Promesas
+
+Lazy evaluations son posibles gracias a una estructura de datos llamada __Promesa__. Las promesas tienen 3 componentes:
+
+1. Una expresión (x+y la cuál da lugar al cómputo diferido)
+2. Un ambiente (donde la expresion será evaluada)
+3. Un valor (que se calcula y se almacena en caché la  primera vez que se accede a una promesa cuando la expresión es evaluada en el ambiente)
+
+```{r e651, exercise=TRUE}
+y <- 10
+h02 <- function(x) {
+  y <- 100
+  x + 1
+}
+# Ejemplo 1
+h02(y)
+#Ejemplo 2
+h02(y <- 1000)
+#Ejemplo 3
+y
+```
+
+Con lo anterior podemos ver que cuando se hace una asignación dentro de una llamada a una función, la variable está ligada fuera de la función, no dentro de ella (Ejemplo 1 y 2).
+
+**Nota** Lass promesas no pueden ser manipuladas con código de R ya que si lo haces la promesa se evaluará y desaparecerá. Para poder explorar las promesas se puede utilizar __quosures__. Este tema se verá en la sección 20. 
+
+### 6.5.2 Argumentos por defecto
+
