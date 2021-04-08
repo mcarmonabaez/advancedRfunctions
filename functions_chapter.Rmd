@@ -430,7 +430,7 @@ h01(stop("This is an error!"))
 
 ### 6.5.1 Promesas
 
-Lazy evaluations son posibles gracias a una estructura de datos llamada __promesa__ 🔮. Las promesas tienen 3 componentes:
+Las evaluaciones no estrictas son posibles gracias a una estructura de datos llamada __promesa__ 🔮. Las promesas tienen 3 componentes:
 
 1. Una expresión (x+y la cuál da lugar al cómputo diferido)
 2. Un ambiente (donde la expresion será evaluada)
@@ -631,3 +631,95 @@ Sin embargo, usar `...` tiene dos desventajas 😟:
 sum(1, 2, NA, na_rm = TRUE)
 #> [1] NA
 ```    
+
+## 6.7 Salir de una función
+
+Por lo regular hay dos maneras en las que las funciones finalizan : 
+  - Regresan un valor indicando el éxito en la ejecución
+  - Regresan un error
+  
+Si regresan un valor, podemos controlar lo que se regresa y como se regresa. Esto nos aporta mayor control sobre el resultado. 
+
+### 6.7.1 Retornos implícitos vs explícitos
+Hay dos maneras en las que una función puede regresar un valor:
+
+  - Implícitamente: Cuando la última expresión evaluada es el valor que regresa.
+```{r e67, exercise=TRUE}
+j01 <- function(x) {
+  if (x < 10) {
+    0
+  } else {
+    10
+  }
+}
+j01(5)
+
+j01(15)
+```  
+
+  - Explícitamente: Cuando llamamos a la función __return()__ para enviar el valor que queremos.
+```{r e671, exercise=TRUE}
+j02 <- function(x) {
+  if (x < 10) {
+    a <- c(x,x+1)
+    b <- c(2*x,x)
+    return(list(a,b))
+  } else {
+    return(10)
+  }
+}
+j02(5)
+
+``` 
+
+### 6.7.2 Valores invisibles
+
+La mayoría de las funciones regresa un calor de forma visible, ya que al llamar a la función en un contexto interactivo se imprime el resultado.
+```{r e672, exercise=TRUE}
+j03 <- function() 1
+j03()
+``` 
+
+Cuando no queremos imprimir el resultado podemos ocupar la función __invisible()__ al valor final que queremos regresar. 
+```{r e6721, exercise=TRUE}
+j04 <- function() invisible(1)
+j04()
+``` 
+
+Si ocupamos la función __invisible()__ podemos verificar si el valor existe imprimiendo el valor explícitamente o poniendolo entre paréntesis
+```{r e6722, exercise=TRUE}
+print(j04())
+
+(j04())
+``` 
+
+Otra función que nos ayuda a verificar si el valor existe y si tiene un estatus visible el valor es la función __withVisible()__.
+```{r e6723, exercise=TRUE}
+str(withVisible(j04()))
+``` 
+
+La función más común que nos regresa un valor invisible es __<-__. La cuál permite hacer una cadena de asignaciones.
+```{r e6724, exercise=TRUE}
+# Valores invisibles
+a <- 2
+(a <- 2)
+withVisible(a <- 2)
+# Cadena de asiganciones
+a <- b <- c <- d <- 2
+``` 
+
+** Nota ** En general, cualquier función llamada principalmente por un efecto secundario como ( <-, View() o plot()) debería devolver un valor invisible. 
+
+### 6.7.3 Errores
+
+Si una función no puede completar su tarea ya que algo esta mál en el proceso se ocupa la función de __stop()__. Esta función detiene la ejecución y regresa un mensaje de error al usuariocon el problema. 
+
+```{r e673, exercise=TRUE}
+j05 <- function() {
+  stop("I'm an error")
+  return(10)
+}
+j05()
+```
+
+### 6.7.3 Gestores de salida
