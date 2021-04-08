@@ -1,5 +1,5 @@
 ---
-title: "Advanced R: Functions"
+title: "Advanced R: Funciones"
 output:
   learnr::tutorial:
     progressive: true
@@ -12,7 +12,7 @@ library(learnr)
 
 ```
 
-## 6.1 Quiz
+## 6.1 Quiz 🎯
 
 ```{r elementos, echo=FALSE}
 question("¿Cuáles son los 3 componentes de una función?",
@@ -80,7 +80,7 @@ question("¿Regresa un error el código anterior? ¿Por qué?",
 )
 ```
 
-## 6.2 Fundamentos de las funciones
+## 6.2 Fundamentos de las funciones 🏗️
 
 Hay 2 cosas importantes para poder entender las funciones.
 
@@ -134,7 +134,7 @@ cada que son utilizadas llaman codigo de __C__ directamente.
 Algunos datos adicionales sobre estas funciones primitivas son:
 
   * Solo podemos encontrarlas en el paquete base.
-  * formals(), body()  y environment() son NULL
+  * `formals()`, `body()`  y `environment()` son NULL
   * Son objetos de tipo 'builtin' o 'special'
 
 ```{r f622, exercise=TRUE}
@@ -160,7 +160,7 @@ f01 <- function(x) {
 f01(1)
 ```
 
-No es necesario siempre vinvular una función a un nombre, podemos crear __funciones anónimas__.
+No es necesario siempre vinvular una función a un nombre, podemos crear __funciones anónimas__ 🤫.
 
 ```{r f6232, exercise=TRUE}
 sapply(mtcars, function(x) length(unique(x)))
@@ -194,13 +194,12 @@ do.call(mean, args)
 #> [1] 5.5
 ```
 
-### 6.2.5 Ejercicios
 
 
 ## 6.3 Composición de funciones
 
 **R** base nos da dos formas de realizar composiciones de llamadas de múltiples funciones:
-anidando o guardando los resultados intermedios.
+anidando 🐣 o guardando los resultados intermedios 🔒.
 
 El paquete magrittr nos da una tercera opción con el operador `%>%`, llamado _pipe_ y
 se pronuncia "y luego".
@@ -274,7 +273,7 @@ El alcance léxico en R sigue las siguientes reglas:
   * Enmascaramiento de nombres o _name masking_ 
   * Funciones vs variables
   * Un nuevo comienzo
-  * Bísqueda dinámica
+  * Búsqueda dinámica
   
 ### 6.4.1 Enmascaramiento de nombres 🥸
 
@@ -359,7 +358,7 @@ g10()
 
 **Importante**: evita usar el mismo nombre para objetos distintos. ☠️☠️
 
-### 6.4.3 Un nuevo comienzo 
+### 6.4.3 Un nuevo comienzo 🌤️
 
 ```{r e643, exercise=TRUE}
 g11 <- function() {
@@ -384,9 +383,9 @@ question("¿Cuál es el resultado al llamar la funcion dos veces?",
 )
 ```
 
-Algo importante que  necesitamos saber es que cada que las funciones son ejecutadas  un nuevo ambiente es creado para permitir la ejecución de la función. Por lo tanto no podemos saber que paso en la ejecución anterior ya que cada ejecución es independiente. 
+⚡ Algo importante que  necesitamos saber es que cada que las funciones son ejecutadas  un nuevo ambiente es creado para permitir la ejecución de la función. Por lo tanto no podemos saber qué paso en la ejecución anterior ya que cada ejecución es independiente. 
 
-### 6.4.4 Búsqueda dinámica
+### 6.4.4 Búsqueda dinámica 🔍
 
 El resultado de ejecutar una función puede  ser  diferente dependiendo de los objetos fuera del entorno,  ya que R busca los valores  cuando se ejecuta la función no cuando la creamos y el alcance léxico determina donde pero no cuando buscar los valores. 
 
@@ -401,25 +400,25 @@ g12()
 #> [1] 21
 ```
 
-Lo anterior puede ser un  problema cuando ejecutamos la función, ya que si no tenemos bien claro todo el ambiente en el  que esta corriendo la función podemos tener un resultado no esperado. 
+Lo anterior puede ser un  problema cuando ejecutamos la función, ya que si no tenemos bien claro todo el ambiente en el  que esta corriendo la función podemos tener un resultado no esperado. 😕
 
-Para poder saber las dependencias externas dentro de una función podemos utilizar __codetools::findGlobals()__.
+Para poder saber las dependencias externas dentro de una función podemos utilizar `codetools::findGlobals()`.
 
 ```{r e6441, exercise=TRUE}
 codetools::findGlobals(g12)
 #> [1] "+" "x"
 ```
 
-Para poder controlar las dependencias externas podemos cambiar el ambiente de la función manualmente a un ambiente que no contiene nada con la función __emptyenv()__.
+Para poder controlar las dependencias externas podemos cambiar el ambiente de la función manualmente a un ambiente que no contiene nada con la función `emptyenv()`.
 
 ```{r e6442, exercise=TRUE}
 environment(g12) <- emptyenv()
 g12()
 ```
 
-**Nota**: __R__ se basa  en el alcance léxico para encontrar todo.
+**Nota**: __R__ se basa  en el alcance léxico para encontrar todo.⭐
 
-## 6.5 Lazy evaluation
+## 6.5 Evaluación no estricta (_lazy evaluation_) 🦥
 
 En __R__ los argumentos de una función son evaluados sólo si se utilizan.
 ```{r e65, exercise=TRUE}
@@ -431,7 +430,7 @@ h01(stop("This is an error!"))
 
 ### 6.5.1 Promesas
 
-Lazy evaluations son posibles gracias a una estructura de datos llamada __Promesa__. Las promesas tienen 3 componentes:
+Lazy evaluations son posibles gracias a una estructura de datos llamada __promesa__ 🔮. Las promesas tienen 3 componentes:
 
 1. Una expresión (x+y la cuál da lugar al cómputo diferido)
 2. Un ambiente (donde la expresion será evaluada)
@@ -453,7 +452,7 @@ y
 
 Con lo anterior podemos ver que cuando se hace una asignación dentro de una llamada a una función, la variable está ligada fuera de la función, no dentro de ella (Ejemplo 1 y 2).
 
-**Nota** Lass promesas no pueden ser manipuladas con código de R ya que si lo haces la promesa se evaluará y desaparecerá. Para poder explorar las promesas se puede utilizar __quosures__. Este tema se verá en la sección 20. 
+**Nota** Las promesas no pueden ser manipuladas con código de R ya que si lo haces la promesa se evaluará y desaparecerá. Para poder explorar las promesas se puede utilizar __quosures__. Este tema se verá en la sección 20. 
 
 ### 6.5.2 Argumentos por defecto
 
@@ -470,11 +469,11 @@ h04 <- function(x = 1, y = x * 2, z = a + b) {
 h04()
 ```
 
-**Nota** Lo anterior puede ser un poco confuso y recomendamos utilizarlo con precaución
+**Nota** Lo anterior puede ser un poco confuso y recomendamos utilizarlo con precaución ☠️
 
 El ambiente en que evaluamos los  argumentos por defecto y los que el usuario nos da pueden ser diferentes, ya que los argumentos por defecto se evaluarán dentro de la función y los dados por el usuario fuera.
 
-```{r e653, exercise=TRUE}
+```{r e6522, exercise=TRUE}
 h05 <- function(x = ls()) {
   a <- 1
   x
@@ -486,4 +485,149 @@ h05()
 h05(ls())
 ```
 
-### 6.5.3 Argumentos ausentes
+### 6.5.3 Argumentos faltantes ❓
+
+Para ver si el valor de un argumento proviene del usuario o de un valor por defecto (_default_), 
+podemos usar `missing()`.
+
+```{r e6523, exercise=TRUE}
+h06 <- function(x = 10) {
+  list(missing(x), x)
+}
+str(h06())
+#> List of 2
+#>  $ : logi TRUE
+#>  $ : num 10
+str(h06(10))
+#> List of 2
+#>  $ : logi FALSE
+#>  $ : num 10
+```
+
+
+Es mejor solo usar `missing()` cuando es necesario. Tomemos `sample()` como un ejemplo.
+¿Cuántos argumentos requiere?
+
+
+
+```{r e65232, exercise=TRUE}
+args(sample)
+#> function (x, size, replace = FALSE, prob = NULL) 
+#> NULL
+```
+
+A simple vista parece que `x` y `size` son necesarios, pero si no damos un valor a
+`size`, `sample()` usa `missing()` para dar un valor. Una manera de reescribir `sample` 
+sería especificando que `size` no es necesario pero podemos darle un valor.
+
+
+```{r e65233, exercise=TRUE}
+sample <- function(x, size = NULL, replace = FALSE, prob = NULL) {
+  if (is.null(size)) {
+    size <- length(x)
+  }
+  
+  x[sample.int(length(x), size, replace = replace, prob = prob)]
+}
+```
+
+
+Podríamos simplificar aún más la función usando el patrón binario creado por la función infix
+`%||%`, la cual usa el lado izquierdo sino es `NULL` y el lado derecho en otro caso.
+
+```{r e652332, exercise=TRUE}
+`%||%` <- function(lhs, rhs) {
+  if (!is.null(lhs)) {
+    lhs
+  } else {
+    rhs
+  }
+}
+
+sample <- function(x, size = NULL, replace = FALSE, prob = NULL) {
+  size <- size %||% length(x)
+  x[sample.int(length(x), size, replace = replace, prob = prob)]
+}
+```
+
+Gracias a la evaluación no estricta, no necesitamos preocuparnos de cálculos innecesarios.
+El lado derecho solo será evaluado si el lado izquierdo es `NULL`. 😌
+
+## 6.6 `...` (punto-punto-punto)
+
+Las funciones pueden tener un argumento especial `...`, con el cual una función puede tomar
+cualquier número de argumentos adicionales. Este tipo de argumento suele ser llamado _varargs_
+(argumentos variables). Una función que usa este argumento es llamada _variádica_.
+
+También se puede usar `...` para pasarle esos argumentos adicionales a otra función.
+
+
+```{r e66, exercise=TRUE}
+i01 <- function(y, z) {
+  list(y = y, z = z)
+}
+
+i02 <- function(x, ...) {
+  i01(...)
+}
+
+str(i02(x = 1, y = 2, z = 3))
+#> List of 2
+#>  $ y: num 2
+#>  $ z: num 3
+```
+
+Existe la forma especial  `..N` (casi no se usa), para referirse a los elementos por su posición.
+
+```{r e662, exercise=TRUE}
+i03 <- function(...) {
+  list(first = ..1, third = ..3)
+}
+str(i03(1, 2, 3))
+#> List of 2
+#>  $ first: num 1
+#>  $ third: num 3
+```
+
+Es más útil `list(...)`, que evalúa los argumentos y los guarda en una lista. 🤯
+
+```{r e663, exercise=TRUE}
+i04 <- function(...) {
+  list(...)
+}
+str(i04(a = 1, b = 2))
+#> List of 2
+#>  $ a: num 1
+#>  $ b: num 2
+```
+
+Hay dos usos principales para `...`:
+
+  - Si tu función usa una función como argumento, necesitamos una manera de pasarle los 
+  argumentos adicionales a esa función. En este ejemplo `lapply()` utiliza `...` para pasar `na.rm` a `mean()`:
+  
+```{r e664, exercise=TRUE}
+x <- list(c(1, 3, NA), c(4, NA, 6))
+str(lapply(x, mean, na.rm = TRUE))
+#> List of 2
+#>  $ : num 2
+#>  $ : num 5
+```  
+
+  - Si una función es S· genérica, necesitas una manera de permitir que los métodos acepten argumentos arbitrarios extra. En el caso de `print()`, como hay muchas maneras para imprimir dependiendo del tipo de objeto, no hay una manera de especificar todos los posibles argumentos y `...` permite tener argumentos diferentes a los métodos individuales.
+  
+```{r e665, exercise=TRUE}
+print(factor(letters), max.levels = 4)
+
+print(y ~ x, showEnv = TRUE)
+```    
+  
+Sin embargo, usar `...` tiene dos desventajas 😟:
+
+  - Cuando le pasas los argumentos a otra función, tienes que tener cuidado de explicar al usuario a dónde es que van esos argumentos. Esto puede hacer complicado usar funciones como `lapply()` y `plot`.
+  - Un argumento mal escrito no va a generar un error. Esto hace más fácil que errores de dedo pasen desapercibidos.
+  
+```{r e666, exercise=TRUE}
+sum(1, 2, NA, na_rm = TRUE)
+#> [1] NA
+```    
